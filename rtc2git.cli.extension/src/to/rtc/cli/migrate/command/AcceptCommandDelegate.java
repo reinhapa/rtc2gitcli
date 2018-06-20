@@ -9,9 +9,7 @@ import com.ibm.team.filesystem.cli.client.internal.subcommands.AcceptCmd;
 import com.ibm.team.filesystem.cli.client.internal.subcommands.AcceptCmdOptions;
 import com.ibm.team.filesystem.cli.core.AbstractSubcommand;
 import com.ibm.team.filesystem.cli.core.Constants;
-import com.ibm.team.filesystem.cli.core.subcommands.CommonOptions;
 import com.ibm.team.filesystem.cli.core.subcommands.IScmClientConfiguration;
-import com.ibm.team.filesystem.client.FileSystemException;
 import com.ibm.team.filesystem.rcp.core.internal.changelog.IChangeLogOutput;
 import com.ibm.team.rtc.cli.infrastructure.internal.core.CLIClientException;
 import com.ibm.team.rtc.cli.infrastructure.internal.parser.ICommandLine;
@@ -83,22 +81,11 @@ public class AcceptCommandDelegate extends RtcCommandDelegate {
 
 	void setSubCommandLine(String targetWorkspace, String changeSetUuid, boolean isBaseline,
 			boolean acceptMissingChangesets) {
-		String uri = getSubCommandOption(config, CommonOptions.OPT_URI);
-		String username = getSubCommandOption(config, CommonOptions.OPT_USERNAME);
-		String password;
-		if (config.getSubcommandCommandLine().hasOption(CommonOptions.OPT_PASSWORD)) {
-			password = getSubCommandOption(config, CommonOptions.OPT_PASSWORD);
-		} else {
-			try {
-				password = config.getConnectionInfo().getPassword();
-			} catch (FileSystemException e) {
-				throw new RuntimeException("Unable to get password", e);
-			}
-		}
-		setSubCommandLine(
-				config,
-				generateCommandLine(uri, username, password, targetWorkspace, changeSetUuid, isBaseline,
-						acceptMissingChangesets));
+		String uri = ConfigHelper.getURI(config);
+		String username = ConfigHelper.getUsername(config);
+		String password = ConfigHelper.getPassword(config);
+		setSubCommandLine(config, generateCommandLine(uri, username, password, targetWorkspace, changeSetUuid,
+				isBaseline, acceptMissingChangesets));
 	}
 
 	private ICommandLine generateCommandLine(String uri, String username, String password, String rtcWorkspace,
